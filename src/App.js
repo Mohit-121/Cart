@@ -59,7 +59,7 @@ class App extends React.Component {
 
   handleDeleteProduct = (id) => {
       const { products } = this.state;
-      const items = products.filter( (item) => item.id!=id);
+      const items = products.filter( (item) => item.id!==id);
 
       this.setState({
           products: items
@@ -80,6 +80,7 @@ class App extends React.Component {
     let cartTotal = 0;
     products.map( (product) => {
       cartTotal+=product.qty*product.price;
+      return '';
     });
     return cartTotal;
   }
