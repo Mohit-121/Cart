@@ -80,10 +80,7 @@ class App extends React.Component {
   handleDecreaseQuantity = (product) => {
     const { products } = this.state;
     const index = products.indexOf(product);
-    // if(products[index].qty===1){
-    //   this.handleDeleteProduct(products[index].id);
-    //   return;
-    // }
+    if(products[index].qty===1) return;
     // products[index].qty -= 1;
     
     // this.setState({
@@ -92,7 +89,7 @@ class App extends React.Component {
 
     const docRef=this.db.collection('products').doc(products[index].id);
     docRef.update({
-      qty:Math.max(0,products[index].qty-1)
+      qty: products[index].qty-1
     }).then(()=>{
       console.log('Update Successfully');
     }).catch((error)=> {
@@ -102,11 +99,20 @@ class App extends React.Component {
 
   handleDeleteProduct = (id) => {
       const { products } = this.state;
-      const items = products.filter( (item) => item.id!==id);
 
-      this.setState({
-          products: items
-      });
+      const docRef=this.db.collection('products').doc(id);
+      docRef.delete()
+            .then(()=>{
+              console.log('Deleted Successfully');
+            }).catch((error)=> {
+              console.log("Error: ",error);
+            });
+
+      // const items = products.filter( (item) => item.id!==id);
+
+      // this.setState({
+      //     products: items
+      // });
   }
 
   getCartCount = () => {
