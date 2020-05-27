@@ -1,36 +1,39 @@
 import React from 'react';
 import Cart from './Cart';
 import Navbar from './Navbar';
+import * as firebase from 'firebase';
 
 class App extends React.Component {
 
   constructor () {
     super();
     this.state = {
-      products: [
-        {
-          price: 99,
-          title: 'Watch',
-          qty: 1,
-          img: 'https://imagex.kartrocket.com/image_thewatchshop/data/Flip-9343-1.jpg?imgeng=/w_1000/h_1400',
-          id: 1
-        },
-        {
-          price: 999,
-          title: 'Mobile Phone',
-          qty: 10,
-          img: 'https://static.toiimg.com/photo/70072353.cms',
-          id: 2
-        },
-        {
-          price: 999,
-          title: 'Laptop',
-          qty: 4,
-          img: 'https://images-na.ssl-images-amazon.com/images/I/81IrFQDQhtL._SL1500_.jpg',
-          id: 3
-        }
-      ]
+      products: [],
+      loading: true
     }
+  }
+
+  componentDidMount () {
+    firebase.firestore()
+            .collection('products')
+            .get()
+            .then((snapshot) => {
+              console.log(snapshot);
+              
+              snapshot.docs.map((doc) => {
+                console.log(doc.data());
+              });
+
+              const products = snapshot.docs.map((doc) =>{
+                const data= doc.data();
+                data['id']=doc.id;
+                return data;
+              });
+              this.setState({
+                products: products,
+                loading: false
+              });
+            });
   }
 
   handleIncreaseQuantity = (product) => {
@@ -86,7 +89,7 @@ class App extends React.Component {
   }
 
   render() {
-    const {products} = this.state;
+    const {products,loading} = this.state;
     return (
       <div className="App">
         <Navbar count = {this.getCartCount()}/>
@@ -96,6 +99,7 @@ class App extends React.Component {
           onDecreaseQuantity={this.handleDecreaseQuantity}
           onDeleteProduct={this.handleDeleteProduct}
         />
+        {loading && <h1>Loading...</h1>}
         <div style={ {fontStyle: 20, padding: 10} }>TOTAL: {this.getCartTotal()}</div>
       </div>
     );
